@@ -4,3 +4,4 @@ dist/
 build/
 logging.log
 *.spec
+*.swp
