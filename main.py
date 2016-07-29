@@ -6,6 +6,7 @@ import os
 import requests
 import subprocess
 import logging
+
 if sys.version_info >= (3, 0):
     print("Python 3")
     import configparser
@@ -14,13 +15,11 @@ else:
     import ConfigParser
 
 
-
 def main():
-    delay = None
     if sys.version_info >= (3, 0):
         # Python 3
         config = configparser.ConfigParser()
-        config.read('config.ini')        
+        config.read('config.ini')
         delay = int(config['DEFAULT']['delay'])
         batch_success_again = config['DEFAULT']['batch_success_again']
         url = config['DEFAULT']['url']
