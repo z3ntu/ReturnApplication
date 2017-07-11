@@ -14,6 +14,24 @@ else:
     print("Python 2")
     import ConfigParser
 
+def works_again(batch_success_again):
+    print("Works again.")
+    logging.warning("Works again.")
+    if os.path.isfile(batch_success_again):
+        subprocess.call(batch_success_again)
+    else:
+        print("Not calling binary because it was not found: " + batch_success_again)
+
+def fail(batch_fail):
+    if last_status != "1":
+        print("Fail!")
+        logging.error("Failed!")
+        if os.path.isfile(batch_fail):
+            subprocess.call(batch_fail)
+        else:
+            print("Not calling binary because it was not found: " + batch_fail)
+    else:
+        print("Fail but not calling script")
 
 def main():
     if sys.version_info >= (3, 0):
@@ -38,29 +56,28 @@ def main():
         subprocess.call(batch_success_again)
     else:
         print("Not calling binary because it was not found: " + batch_success_again)
+
+    # Main loop
     while True:
-        response = requests.get(url)
-        status = response.text.replace("\n", "")
+        try:
+            # get status
+            response = requests.get(url)
+            # trim output
+            status = response.text.replace("\n", "")
+        except Exception as e:
+            print("Exception while getting the status. Treating as fail.")
+            print(e)
+            status = 1
+        # check current status
         if status == "1":  # fail
-            if last_status != "1":
-                print("Fail!")
-                logging.error("Failed!")
-                if os.path.isfile(batch_fail):
-                    subprocess.call(batch_fail)
-                else:
-                    print("Not calling binary because it was not found: " + batch_fail)
-            else:
-                print("Fail but not calling script")
+            fail(batch_fail)
         elif last_status == "1":  # success again
-            print("Works again.")
-            logging.warning("Works again.")
-            if os.path.isfile(batch_success_again):
-                subprocess.call(batch_success_again)
-            else:
-                print("Not calling binary because it was not found: " + batch_success_again)
+            works_again(batch_success_again)
         else:
             print("Works.")
+        # save current status for next iteration
         last_status = status
+        # sleep for specificed duration
         sleep(delay)
 
 
